@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:jellyfiner/screens/config_select.dart';
+import 'package:jellyfiner/screens/main_screen.dart';
 import 'package:jellyfiner/screens/server_input.dart';
 import 'package:jellyfiner/types/server_config.dart';
 import 'package:jellyfiner/utils/configs_manager.dart';
@@ -24,6 +25,20 @@ class _SplashScreenState extends State<SplashScreen> {
         MaterialPageRoute(builder: (context) => const ServerInput()),
       );
     } else {
+      for (final config in configs) {
+        print(config.isDefault);
+        if (config.isDefault) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainScreen(
+                config: config,
+              ),
+            ),
+          );
+          return;
+        }
+      }
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
