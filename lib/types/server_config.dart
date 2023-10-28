@@ -5,19 +5,19 @@ part 'server_config.g.dart';
 @HiveType(typeId: 1)
 class ServerConfig extends HiveObject {
   @HiveField(0)
-  final String username;
+  String username;
 
   @HiveField(1)
-  final String token;
+  String token;
 
   @HiveField(2)
-  final String serverUrl;
+  String serverUrl;
 
   @HiveField(3)
-  final String configName;
+  String configName;
 
   @HiveField(4)
-  final String isDefault;
+  bool isDefault;
 
   ServerConfig({
     required this.username,
@@ -26,4 +26,9 @@ class ServerConfig extends HiveObject {
     required this.configName,
     required this.isDefault,
   });
+
+  @override
+  String toString() {
+    return 'ServerConfig{username: $username, token: $token, serverUrl: $serverUrl, configName: $configName, isDefault: $isDefault}';
+  }
 }

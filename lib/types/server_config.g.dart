@@ -21,7 +21,7 @@ class ServerConfigAdapter extends TypeAdapter<ServerConfig> {
       token: fields[1] as String,
       serverUrl: fields[2] as String,
       configName: fields[3] as String,
-      isDefault: fields[4] as String,
+      isDefault: fields[4] as bool,
     );
   }
 

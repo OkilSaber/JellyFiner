@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jellyfiner/api/auth.dart';
 import 'package:jellyfiner/screens/splash_screen.dart';
+import 'package:jellyfiner/utils/configs_manager.dart';
 import 'package:jellyfiner/utils/custom_colors.dart';
 
 class ServerInput extends StatefulWidget {
-  const ServerInput({Key? key}) : super(key: key);
+  final bool pullConfigsAtPop;
+  const ServerInput({Key? key, this.pullConfigsAtPop = false})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ServerInputState();
@@ -20,6 +23,7 @@ class _ServerInputState extends State<ServerInput> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _serverController = TextEditingController();
   final TextEditingController _configName = TextEditingController();
+  bool isDefault = false;
   bool showPassword = false;
   bool isLoading = false;
 
@@ -36,13 +40,27 @@ class _ServerInputState extends State<ServerInput> {
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Add a config'),
+        elevation: 0,
+        backgroundColor: CustomColors.darkPrimary,
+        leading: widget.pullConfigsAtPop
+            ? IconButton(
+                icon: const Icon(CupertinoIcons.chevron_left),
+                onPressed: () async {
+                  Navigator.of(context).pop(
+                      await Future.wait(await ConfigsManager.getAllConfigs()));
+                },
+              )
+            : null,
+      ),
       body: SafeArea(
         child: Center(
           child: Form(
             key: _formKey,
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: mediaQuery.width * .05),
-              height: mediaQuery.height * .40,
+              height: mediaQuery.height * .50,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -174,6 +192,23 @@ class _ServerInputState extends State<ServerInput> {
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide.none)),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Set as default config",
+                        style: GoogleFonts.nunitoSans(),
+                      ),
+                      Checkbox(
+                        value: isDefault,
+                        onChanged: (value) {
+                          setState(() {
+                            isDefault = !isDefault;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                   ElevatedButton(
                     onPressed: () async {
                       if (isLoading) {
@@ -189,6 +224,7 @@ class _ServerInputState extends State<ServerInput> {
                         _passwordController.text,
                         _serverController.text,
                         _configName.text,
+                        isDefault,
                       );
                       if (error.isNotEmpty) {
                         setState(() => isLoading = false);

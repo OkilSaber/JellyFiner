@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jellyfiner/screens/edit_config.dart';
+import 'package:jellyfiner/screens/server_input.dart';
 import 'package:jellyfiner/screens/splash_screen.dart';
 import 'package:jellyfiner/types/server_config.dart';
 import 'package:jellyfiner/utils/custom_colors.dart';
@@ -29,6 +30,35 @@ class _ConfigSelectState extends State<ConfigSelect> {
         title: const Text('Select a config'),
         elevation: 0,
         backgroundColor: CustomColors.darkPrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(CupertinoIcons.add),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(
+                MaterialPageRoute(
+                  builder: (context) => const ServerInput(
+                    pullConfigsAtPop: true,
+                  ),
+                ),
+              )
+                  .then(
+                (newConfigs) {
+                  if (newConfigs.isEmpty) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                          builder: (context) => const SplashScreen()),
+                    );
+                  } else {
+                    setState(() {
+                      configs = newConfigs;
+                    });
+                  }
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: configs.length,
@@ -55,7 +85,8 @@ class _ConfigSelectState extends State<ConfigSelect> {
                     if (newConfigs.isEmpty) {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                            builder: (context) => const SplashScreen()),
+                          builder: (context) => const SplashScreen(),
+                        ),
                       );
                     } else {
                       setState(() {

@@ -13,6 +13,7 @@ class AuthApi {
     String password,
     String serverUrl,
     String serverName,
+    bool isDefault,
   ) async {
     await Future.delayed(const Duration(seconds: 2));
     if (serverUrl.endsWith("/")) {
@@ -45,7 +46,11 @@ class AuthApi {
           serverUrl: serverUrl,
           token: token,
           username: username,
+          isDefault: isDefault,
         );
+        if (isDefault) {
+          ConfigsManager.resetDefaultConfig();
+        }
         ConfigsManager.addConfig(serverConfig);
         return "";
       } else {

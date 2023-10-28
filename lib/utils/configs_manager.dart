@@ -12,14 +12,17 @@ class ConfigsManager {
 
   static Box get box => Hive.box(_boxName);
 
-  static Future<ServerConfig> getConfig(String key) async {
+  static Future<ServerConfig?> getConfig(String key) async {
     return ConfigsManager.box.get(key);
   }
 
   static Future<List<Future<ServerConfig>>> getAllConfigs() async {
     final List<Future<ServerConfig>> configs = [];
     for (String key in ConfigsManager.box.keys) {
-      configs.add(ConfigsManager.getConfig(key));
+      final ServerConfig? config = await ConfigsManager.getConfig(key);
+      if (config != null) {
+        configs.add(Future.value(config));
+      }
     }
     return configs;
   }
@@ -30,5 +33,16 @@ class ConfigsManager {
 
   static Future<void> deleteConfig(String key) async {
     await ConfigsManager.box.delete(key);
+  }
+
+  static Future<void> resetDefaultConfig() async {
+    final List<ServerConfig> configs =
+        await Future.wait(await ConfigsManager.getAllConfigs());
+    for (ServerConfig config in configs) {
+      if (config.isDefault) {
+        config.isDefault = false;
+        await ConfigsManager.addConfig(config);
+      }
+    }
   }
 }
