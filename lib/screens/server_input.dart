@@ -10,8 +10,7 @@ import 'package:jellyfiner/utils/custom_colors.dart';
 
 class ServerInput extends StatefulWidget {
   final bool pullConfigsAtPop;
-  const ServerInput({Key? key, this.pullConfigsAtPop = false})
-      : super(key: key);
+  const ServerInput({super.key, this.pullConfigsAtPop = false});
 
   @override
   State<StatefulWidget> createState() => _ServerInputState();

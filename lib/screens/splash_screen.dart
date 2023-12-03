@@ -9,7 +9,7 @@ import 'package:jellyfiner/utils/configs_manager.dart';
 import 'package:jellyfiner/utils/custom_colors.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<StatefulWidget> createState() => _SplashScreenState();
@@ -26,7 +26,6 @@ class _SplashScreenState extends State<SplashScreen> {
       );
     } else {
       for (final config in configs) {
-        print(config.isDefault);
         if (config.isDefault) {
           Navigator.pushReplacement(
             context,

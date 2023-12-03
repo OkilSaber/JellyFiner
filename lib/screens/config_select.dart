@@ -9,7 +9,7 @@ import 'package:jellyfiner/utils/custom_colors.dart';
 class ConfigSelect extends StatefulWidget {
   final List<ServerConfig> configs;
 
-  const ConfigSelect({Key? key, required this.configs}) : super(key: key);
+  const ConfigSelect({super.key, required this.configs});
   @override
   State<StatefulWidget> createState() => _ConfigSelectState();
 }

@@ -10,7 +10,7 @@ import 'package:jellyfiner/utils/custom_colors.dart';
 
 class EditConfig extends StatefulWidget {
   final ServerConfig config;
-  const EditConfig({Key? key, required this.config}) : super(key: key);
+  const EditConfig({super.key, required this.config});
 
   @override
   State<StatefulWidget> createState() => _EditConfigState();
