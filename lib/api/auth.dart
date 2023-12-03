@@ -20,16 +20,16 @@ class AuthApi {
       serverUrl = serverUrl.substring(0, serverUrl.length - 1);
     }
 
-    const Uuid uuid = Uuid();
-    final device = (await DeviceInfoPlugin().deviceInfo).data["product"];
     try {
+      String uuid = const Uuid().v1();
+      final device = (await DeviceInfoPlugin().deviceInfo).data["product"];
       http.Response response = await http.post(
         Uri.parse("$serverUrl/Users/authenticatebyname"),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Authorization':
-              'MediaBrowser Client="${Constants.appName}", Version=${Constants.version}, DeviceId="${uuid.v1()}", Device="$device"',
+              'MediaBrowser Client="${Constants.appName}", Version=${Constants.version}, DeviceId="$uuid", Device="$device"',
         },
         body: jsonEncode(
           <String, String>{
@@ -41,12 +41,17 @@ class AuthApi {
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
         final String token = data["AccessToken"];
+        final String serverId = data["User"]["ServerId"];
+        final String userId = data["User"]["Id"];
         final ServerConfig serverConfig = ServerConfig(
           configName: serverName,
           serverUrl: serverUrl,
           token: token,
           username: username,
           isDefault: isDefault,
+          deviceId: uuid,
+          userId: userId,
+          serverId: serverId,
         );
         if (isDefault) {
           ConfigsManager.resetDefaultConfig();

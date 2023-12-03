@@ -22,13 +22,16 @@ class ServerConfigAdapter extends TypeAdapter<ServerConfig> {
       serverUrl: fields[2] as String,
       configName: fields[3] as String,
       isDefault: fields[4] as bool,
+      deviceId: fields[5] as String,
+      userId: fields[6] as String,
+      serverId: fields[7] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, ServerConfig obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.username)
       ..writeByte(1)
@@ -38,7 +41,13 @@ class ServerConfigAdapter extends TypeAdapter<ServerConfig> {
       ..writeByte(3)
       ..write(obj.configName)
       ..writeByte(4)
-      ..write(obj.isDefault);
+      ..write(obj.isDefault)
+      ..writeByte(5)
+      ..write(obj.deviceId)
+      ..writeByte(6)
+      ..write(obj.userId)
+      ..writeByte(7)
+      ..write(obj.serverId);
   }
 
   @override
