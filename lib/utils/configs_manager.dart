@@ -35,6 +35,10 @@ class ConfigsManager {
     await ConfigsManager.box.delete(key);
   }
 
+  static Future<void> deleteAllConfigs() async {
+    await ConfigsManager.box.clear();
+  }
+
   static Future<void> resetDefaultConfig() async {
     final List<ServerConfig> configs =
         await Future.wait(await ConfigsManager.getAllConfigs());
