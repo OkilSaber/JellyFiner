@@ -14,8 +14,15 @@ class HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
   int nb = 0;
+  late Future<List> items;
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    items = ItemApi.getItems(widget.config);
+  }
 
   @override
   Widget build(BuildContext context) {
