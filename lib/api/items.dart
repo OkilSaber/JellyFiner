@@ -11,8 +11,7 @@ class ItemApi {
     try {
       final device = (await DeviceInfoPlugin().deviceInfo).data["product"];
       http.Response response = await http.get(
-        Uri.parse(
-            "${config.serverUrl}/Items?userId=${config.userId}&enableTotalRecordCount=true&enableImages=true"),
+        Uri.parse("${config.serverUrl}/Users/${config.userId}/Items"),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -32,6 +31,52 @@ class ItemApi {
       }
     } catch (e) {
       return [];
+    }
+  }
+
+  static Future<List<Item>> getResumeItems(ServerConfig config) async {
+    try {
+      final device = (await DeviceInfoPlugin().deviceInfo).data["product"];
+      http.Response response = await http.get(
+        Uri.parse("${config.serverUrl}/Users/${config.userId}/Items/Resume"),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization':
+              'MediaBrowser Token="${config.token}", Client="${Constants.appName}", Version"=${Constants.version}", Device="$device", DeviceId="${config.deviceId}"',
+        },
+      );
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        final List<Item> items = [];
+        for (var item in data["Items"]) {
+          items.add(Item.fromJson(item));
+        }
+        return items;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<void> getCollectionItems(
+      ServerConfig config, Item collection) async {
+    try {
+      final device = (await DeviceInfoPlugin().deviceInfo).data["product"];
+      http.Response response = await http.get(
+        Uri.parse(
+            "${config.serverUrl}/Users/${config.userId}/Items/${collection.id}"),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization':
+              'MediaBrowser Token="${config.token}", Client="${Constants.appName}", Version"=${Constants.version}", Device="$device", DeviceId="${config.deviceId}"',
+        },
+      );
+    } catch (e) {
+      return;
     }
   }
 }

@@ -43,4 +43,14 @@ class ServerConfig extends HiveObject {
   String toString() {
     return 'ServerConfig{username: $username, token: $token, serverUrl: $serverUrl, configName: $configName, isDefault: $isDefault}, deviceID: $deviceId, userId: $userId, serverId: $serverId';
   }
+
+  //getters
+  String get getUsername => username;
+  String get getToken => token;
+  String get getServerUrl => serverUrl;
+  String get getConfigName => configName;
+  bool get getIsDefault => isDefault;
+  String get getDeviceId => deviceId;
+  String get getUserId => userId;
+  String get getServerId => serverId;
 }
