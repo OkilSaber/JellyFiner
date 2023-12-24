@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jellyfiner/api/items.dart';
+import 'package:jellyfiner/components/items_list.dart';
 import 'package:jellyfiner/screens/collection_page.dart';
 import 'package:jellyfiner/types/server_config.dart';
-import 'package:jellyfiner/components/item_card.dart';
-import 'package:jellyfiner/utils/custom_colors.dart';
 
 class HomeTab extends StatefulWidget {
   final ServerConfig config;
@@ -14,136 +13,101 @@ class HomeTab extends StatefulWidget {
   State<StatefulWidget> createState() => _HomeTabState();
 }
 
-class _HomeTabState extends State<HomeTab> with AutomaticKeepAliveClientMixin {
+class _HomeTabState extends State<HomeTab> {
   int nb = 0;
   late Future<List> collections;
   late Future<List> resume;
-  @override
-  bool get wantKeepAlive => true;
+  late Future<List> nextUp;
+  bool displayResume = false;
+  bool displayNextUp = false;
 
   @override
   void initState() {
     super.initState();
-    try {
-      collections = ItemApi.getItems(widget.config);
-      resume = ItemApi.getResumeItems(widget.config);
-    } catch (e) {
-      collections = Future.value([]);
-      resume = Future.value([]);
-    }
+    collections = ItemApi.getItems(widget.config).catchError((e) {
+      return [];
+    });
+    resume = ItemApi.getResumeItems(widget.config).then((value) {
+      if (value.isNotEmpty) {
+        setState(() => displayResume = true);
+      }
+      return value;
+    }).catchError((e) {
+      return [];
+    });
+    nextUp = ItemApi.getNextUpItems(widget.config).then((value) {
+      if (value.isNotEmpty) {
+        setState(() => displayNextUp = true);
+      }
+      return value;
+    }).catchError((e) {
+      return [];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
-              child: FutureBuilder<List>(
-                future: collections,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return ItemCard(
-                          item: snapshot.data![index],
-                          config: widget.config,
-                          isFirst: index == 0,
-                          isLast: index == snapshot.data!.length - 1,
-                          onTap: () {
-                            Navigator.of(context, rootNavigator: true).push(
-                              MaterialPageRoute(
-                                builder: (context) => CollectionPage(
-                                  item: snapshot.data![index],
-                                  config: widget.config,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  } else if (snapshot.hasError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                            "Configuration name already exists, please choose another one"),
-                        backgroundColor: CustomColors.red,
+              // Container(
+              // height: 300,
+              child: ItemsList(
+                title: "Collections",
+                config: widget.config,
+                items: collections,
+                onTap: (item) {
+                  Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                      builder: (context) => CollectionPage(
+                        item: item,
+                        config: widget.config,
                       ),
-                    );
-                    return const Center(
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-                  return const Center(
-                    child: SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: CircularProgressIndicator(),
                     ),
                   );
                 },
               ),
             ),
             Expanded(
-              child: FutureBuilder<List>(
-                future: resume,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return ItemCard(
-                          item: snapshot.data![index],
+              child: Visibility(
+                visible: displayResume,
+                child: ItemsList(
+                  config: widget.config,
+                  items: resume,
+                  onTap: (item) {
+                    Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                        builder: (context) => CollectionPage(
+                          item: item,
                           config: widget.config,
-                          isFirst: index == 0,
-                          isLast: index == snapshot.data!.length - 1,
-                          onTap: () {
-                            Navigator.of(context, rootNavigator: true).push(
-                              MaterialPageRoute(
-                                builder: (context) => CollectionPage(
-                                  item: snapshot.data![index],
-                                  config: widget.config,
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      },
-                    );
-                  } else if (snapshot.hasError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
-                            "Configuration name already exists, please choose another one"),
-                        backgroundColor: CustomColors.red,
+                        ),
                       ),
                     );
-                    return const Center(
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(),
+                  },
+                  title: "Resume",
+                ),
+              ),
+            ),
+            Expanded(
+              child: Visibility(
+                visible: displayNextUp,
+                child: ItemsList(
+                  title: "Next Up",
+                  config: widget.config,
+                  items: nextUp,
+                  onTap: (item) {
+                    Navigator.of(context, rootNavigator: true).push(
+                      MaterialPageRoute(
+                        builder: (context) => CollectionPage(
+                          item: item,
+                          config: widget.config,
+                        ),
                       ),
                     );
-                  }
-                  return const Center(
-                    child: SizedBox(
-                      width: 50,
-                      height: 50,
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                },
+                  },
+                ),
               ),
             ),
           ],

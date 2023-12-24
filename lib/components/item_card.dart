@@ -26,12 +26,25 @@ class ItemCard extends StatefulWidget {
 }
 
 class _ItemCardState extends State<ItemCard> {
+  late String title;
+
+  @override
+  void initState() {
+    super.initState();
+    title = widget.item.seriesName.isNotEmpty
+        ? widget.item.seriesName
+        : widget.item.name;
+    if (title.length > 20) {
+      title = "${title.substring(0, 15)}...";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
       child: Padding(
         padding: EdgeInsets.only(
-          top: 20,
+          // top: 10,
           left: widget.isFirst ? 10 : 0,
           right: widget.isLast ? 10 : 5,
         ),
@@ -47,17 +60,26 @@ class _ItemCardState extends State<ItemCard> {
               CachedNetworkImage(
                 imageUrl: widget.item.getImageUrl(widget.config),
                 errorWidget: (context, url, error) => const Icon(Icons.error),
-                width: 400,
-                height: 225,
+                width: 303,
+                height: 170,
                 fit: BoxFit.cover,
                 alignment: Alignment.center,
+                progressIndicatorBuilder: (context, url, downloadProgress) {
+                  return Center(
+                    child: SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: CircularProgressIndicator(
+                        value: downloadProgress.progress,
+                      ),
+                    ),
+                  );
+                },
               ),
               Text(
-                widget.item.seriesName.isNotEmpty
-                    ? widget.item.seriesName
-                    : widget.item.name,
+                title,
                 style: const TextStyle(
-                  fontSize: 20,
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                   decoration: TextDecoration.none,

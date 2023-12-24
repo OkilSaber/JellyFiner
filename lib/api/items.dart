@@ -79,4 +79,31 @@ class ItemApi {
       return;
     }
   }
+
+  static Future<List<Item>> getNextUpItems(ServerConfig config) async {
+    try {
+      final device = (await DeviceInfoPlugin().deviceInfo).data["product"];
+      http.Response response = await http.get(
+        Uri.parse("${config.serverUrl}/Shows/NextUp?userId=${config.userId}"),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization':
+              'MediaBrowser Token="${config.token}", Client="${Constants.appName}", Version"=${Constants.version}", Device="$device", DeviceId="${config.deviceId}"',
+        },
+      );
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+        final List<Item> items = [];
+        for (var item in data["Items"]) {
+          items.add(Item.fromJson(item));
+        }
+        return items;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
