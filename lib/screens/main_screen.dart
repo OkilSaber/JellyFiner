@@ -16,6 +16,8 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  final CupertinoTabController _tabController =
+      CupertinoTabController(initialIndex: 0);
 
   late List<Widget> _widgetOptions;
 
@@ -45,6 +47,12 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
@@ -64,14 +72,9 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
+      controller: _tabController,
       tabBuilder: (BuildContext context, int index) {
-        return CupertinoTabView(
-          builder: (BuildContext context) {
-            return CupertinoPageScaffold(
-              child: _widgetOptions.elementAt(_selectedIndex),
-            );
-          },
-        );
+        return IndexedStack(index: _selectedIndex, children: _widgetOptions);
       },
     );
   }
